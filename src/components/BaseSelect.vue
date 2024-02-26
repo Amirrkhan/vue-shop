@@ -24,17 +24,13 @@ const model = defineModel()
 function updateValue(e: Event) {
   model.value = (e.target as HTMLSelectElement).value
 }
-function generateUniCodeEl(unicode: string) {
-  return unicode && String.fromCharCode(parseInt(unicode, 16))
-}
 </script>
 <template>
   <div>
     <select :value="modelValue" @input="updateValue" v-bind="$attrs">
       <option value="" disabled selected>{{ selectPlaceholderText }}</option>
-      <option v-for="(item, index) in options" v-bind:key="index" :value="item.value">
+      <option v-for="(item, index) in options" v-bind:key="index" :value="item.sortValue">
         {{ item.value }}
-        {{ generateUniCodeEl(item.uniEl) }}
       </option>
     </select>
   </div>

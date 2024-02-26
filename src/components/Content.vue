@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, watch } from 'vue'
 
 import CardList from './CardList.vue'
 import BaseInput from './BaseInput.vue'
@@ -7,9 +7,9 @@ import BaseSelect from './BaseSelect.vue'
 
 const base_url = import.meta.env.VITE_BASE_URL
 
-const states = reactive({
-  selectValue: '',
-  inputValue: ''
+const filters = reactive({
+  sortSelectValue: '',
+  searchInputValue: ''
 })
 const products = ref<Products | []>([])
 
@@ -19,21 +19,20 @@ const imgInput = {
   class: 'absolute top-3.5 left-4'
 }
 
-const options = [
+const optionsSortSelect = [
   {
     value: 'Name',
-    uniEl: ''
+    sortValue: 'title'
   },
   {
-    value: 'Price',
-    uniEl: '2191'
+    value: 'Price (cheap.)',
+    sortValue: 'price'
   },
   {
-    value: 'Price',
-    uniEl: '2193'
+    value: 'Price (expens.)',
+    sortValue: '-price'
   }
 ]
-
 defineProps({
   title: {
     type: String,
@@ -41,10 +40,28 @@ defineProps({
   }
 })
 
-onMounted(async function () {
-  const data = await fetch(`${base_url}/products`).then((res) => res.json())
-  products.value = data
-})
+async function fetchProducts() {
+  try {
+    let paramsString = ''
+
+    if (filters.searchInputValue) {
+      paramsString = paramsString + `title=*${filters.searchInputValue}&`
+    }
+    if (filters.sortSelectValue) {
+      paramsString = paramsString + `sortBy=${filters.sortSelectValue}&`
+    }
+
+    const data = await fetch(`${base_url}/products?${paramsString}`).then((res) => res.json())
+    if (data.error) throw new Error(data.message)
+    products.value = data
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+onMounted(fetchProducts)
+
+watch(filters, fetchProducts)
 </script>
 
 <template>
@@ -54,15 +71,15 @@ onMounted(async function () {
 
       <div class="flex gap-4">
         <BaseSelect
-          v-model="states.selectValue"
-          :options="options"
+          v-model="filters.sortSelectValue"
+          :options="optionsSortSelect"
           select-placeholder-text="Sort by"
           class="py-2 px-3 border rounded-md outline-none"
         />
         <p></p>
         <div class="relative">
           <BaseInput
-            v-model="states.inputValue"
+            v-model="filters.searchInputValue"
             :img="imgInput"
             type="text"
             placeholder="Search..."

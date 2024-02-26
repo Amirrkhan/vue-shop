@@ -13,11 +13,9 @@ interface Product {
   price: number
   imageUrl: string
 }
-
 interface Option {
   value: string
-  uniEl: string
+  sortValue: string
 }
-
 type Options = Option[]
 type Products = Product[]
