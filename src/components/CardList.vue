@@ -1,22 +1,27 @@
 <script lang="ts" setup>
+import type { PropType } from 'vue'
 import Card from './Card.vue'
+defineProps({
+  items: {
+    type: Array as PropType<Products>,
+    default() {
+      return Array
+    }
+  }
+})
 </script>
 
 <template>
   <div class="grid grid-cols-4 gap-5">
     <Card
-      image-url="/sneakers/sneakers-1.jpg"
-      title="Lorem ipsum dolor sit amet."
-      :price="1200"
+      v-for="item in items"
+      :image-url="item.imageUrl"
+      :title="item.title"
+      :price="item.price"
       :is-added="false"
       :is-favorite="false"
+      v-bind:key="item.id"
     />
-    <Card />
-    <Card />
-    <Card />
-    <Card />
-    <Card />
-    <Card />
   </div>
 </template>
 
