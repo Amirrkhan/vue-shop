@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref, watch } from 'vue'
+import { onMounted, provide, reactive, ref, watch } from 'vue'
 
 import CardList from './CardList.vue'
 import BaseInput from './BaseInput.vue'
@@ -11,6 +11,7 @@ const filters = reactive({
   sortSelectValue: '',
   searchInputValue: ''
 })
+
 const products = ref<Products | []>([])
 
 const imgInput = {
@@ -59,9 +60,99 @@ async function fetchProducts() {
   }
 }
 
-onMounted(fetchProducts)
+async function fetchFavorites() {
+  try {
+    const data = await fetch(`${base_url}/favorites`).then((res) => res.json())
+    if (data.error) throw new Error(data.message)
+    products.value = products.value.map((product) => {
+      const favorite = data.find((favorite: Product) => favorite.productId === product.id)
+
+      if (!favorite) {
+        return product
+      }
+      return {
+        ...product,
+        isFavorite: true,
+        favoriteId: favorite.id
+      }
+    })
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+async function postFavorites(productId: Number) {
+  try {
+    const rawResponse = await fetch(`${base_url}/favorites`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ productId })
+    })
+
+    const content = await rawResponse.json()
+
+    if (content.error) throw new Error(content.message)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+async function fetchFavoritesByProductId(productId: Number) {
+  try {
+    const data = await fetch(`${base_url}/favorites?productId=${productId.toString()}`).then(
+      (res) => res.json()
+    )
+    if (data.error) throw new Error(data.message)
+
+    return data[0].id
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+async function deleteFavorite(productId: Number) {
+  try {
+    const id = await fetchFavoritesByProductId(productId)
+
+    const rawResponse = await fetch(`${base_url}/favorites/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: null
+    })
+
+    const content = await rawResponse.json()
+    console.log(content)
+    if (content.error) throw new Error(content.message)
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+async function addToFavorites(product: Product) {
+  product.isFavorite && postFavorites(product.productId)
+  !product.isFavorite && deleteFavorite(product.productId)
+
+  products.value = products.value.map((item) =>
+    item.id === product.productId
+      ? { ...item, isFavorite: product.isFavorite, productId: product.productId }
+      : item
+  )
+}
+
+onMounted(async function () {
+  await fetchProducts()
+  await fetchFavorites()
+})
 
 watch(filters, fetchProducts)
+
+provide('addToFavorites', addToFavorites)
 </script>
 
 <template>

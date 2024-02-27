@@ -18,8 +18,9 @@ defineProps({
       :image-url="item.imageUrl"
       :title="item.title"
       :price="item.price"
-      :is-added="false"
-      :is-favorite="false"
+      :is-added="item.isAdded"
+      :is-favorite="item.isFavorite"
+      :product-id="item.id"
       v-bind:key="item.id"
     />
   </div>
