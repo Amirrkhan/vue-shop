@@ -1,14 +1,29 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+defineProps({
+  title: {
+    type: String,
+    default: ''
+  },
+  imageUrl: {
+    type: String,
+    default: ''
+  },
+  price: {
+    type: Number
+  }
+})
+</script>
 <template>
   <div
-    class="flex items-center border border-slate-200 p-4 rounded-xl gap-4 cursor-pointer hover:shadow-lg transition"
+    class="flex items-center border border-slate-200 p-4 rounded-xl gap-4 cursor-pointer hover:shadow-lg mt-4"
   >
-    <img class="w-16 h-16" src="/sneakers/sneakers-1.jpg" alt="" />
-    <div class="flex flex-col">
-      <p>Lorem ipsum dolor sit amet.</p>
+    <img class="w-16 h-16" :src="imageUrl" :alt="title" />
+    <div class="flex flex-col w-full">
+      <p>{{ title }}</p>
       <div class="flex justify-between mt-2">
-        <b>12999 czk</b>
+        <b>{{ price }} czk</b>
         <img
+          @click="$emit('remove-from-cart')"
           src="/close.svg"
           alt="close"
           class="opacity-40 cursor-pointer transition hover:opacity-100"

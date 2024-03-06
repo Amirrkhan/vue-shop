@@ -15,6 +15,7 @@ defineProps({
       viewBox="0 0 16 14"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      @click="$emit('toggleDrawer')"
     >
       <path
         d="M1 7H14.7143"

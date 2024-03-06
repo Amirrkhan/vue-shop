@@ -1,25 +1,39 @@
 /// <reference types="vite/client" />
-interface Image {
+type Image = {
   src: string
   alt: string
   class: string
 }
 
-interface Product {
+type Product = {
   id: number
-  productId: number
   title: string
   price: number
   imageUrl: string
   isFavorite: boolean
   isAdded: boolean
+  favoriteId: number
+  product_id: number
 }
 
-interface Option {
+type Favorite = {
+  product_id: number
+  id: number
+  product: Product
+}
+
+type Option = {
   value: string
   sortValue: string
 }
 
-type Options = Option[]
+interface CartToInject {
+  addToFavorites: function
+  onClickAddPlus: function
+  removeFromCart: function
+}
 
-type Products = Product[]
+interface Options extends Array<Option> {}
+interface Products extends Array<Product> {
+  value: Array
+}

@@ -1,21 +1,15 @@
 <script setup lang="ts">
-import { inject } from 'vue'
-
-const props = defineProps({
+defineProps({
   imageUrl: {
     type: String,
     default: ''
-  },
-  productId: {
-    type: Number
   },
   title: {
     type: String,
     default: ''
   },
   price: {
-    type: Number,
-    default: null
+    type: Number
   },
   isFavorite: {
     type: Boolean,
@@ -24,23 +18,8 @@ const props = defineProps({
   isAdded: {
     type: Boolean,
     default: false
-  },
-  onClickAdd: {
-    type: Function,
-    default: null
   }
 })
-
-const addToFavorites = inject<Function>('addToFavorites')
-
-function onClickFavorite() {
-  const favoriteObj = {
-    productId: props.productId,
-    isFavorite: props.isFavorite ? false : true
-  }
-
-  addToFavorites !== undefined && addToFavorites(favoriteObj)
-}
 </script>
 
 <template>
@@ -50,8 +29,8 @@ function onClickFavorite() {
     <img
       :src="isFavorite ? 'like-2.svg' : '/like-1.svg'"
       alt="add-to-favorites"
-      class="absolute top-8 left-8"
-      @click="onClickFavorite"
+      class="absolute top-8 left-8 border border-slate-200 rounded-xl"
+      @click="$emit('add-to-favorites')"
     />
     <img :src="imageUrl" alt="sneaker" />
     <p class="mt-2">{{ title }}</p>
@@ -60,7 +39,8 @@ function onClickFavorite() {
         <span class="text-slate-400">Price:</span>
         <span>{{ price }} czk</span>
       </div>
-      <img :src="!isAdded ? '/plus.svg' : '/checked.svg'" alt="plus" />
+
+      <img :src="!isAdded ? '/plus.svg' : '/checked.svg'" alt="plus" @click="$emit('toggleAdd')" />
     </div>
   </div>
 </template>
